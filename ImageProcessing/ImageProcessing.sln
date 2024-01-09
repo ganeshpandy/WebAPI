@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageProcessing", "ImageProcessing\ImageProcessing.csproj", "{FD89BCAC-CA41-4E32-B74A-B1FE9050728B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image", "Image\Image.csproj", "{FD61E967-C1EF-40A3-A316-3205D56A0984}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD89BCAC-CA41-4E32-B74A-B1FE9050728B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD89BCAC-CA41-4E32-B74A-B1FE9050728B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD89BCAC-CA41-4E32-B74A-B1FE9050728B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD89BCAC-CA41-4E32-B74A-B1FE9050728B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD61E967-C1EF-40A3-A316-3205D56A0984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD61E967-C1EF-40A3-A316-3205D56A0984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD61E967-C1EF-40A3-A316-3205D56A0984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD61E967-C1EF-40A3-A316-3205D56A0984}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4740312D-33A8-4E10-B719-97B3AF427213}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@SqlTest_HostAddress = http://localhost:5119
+
+GET {{SqlTest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
