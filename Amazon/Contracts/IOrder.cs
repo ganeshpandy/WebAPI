@@ -14,7 +14,8 @@ namespace Contracts
         Task<T> Add(T entity);
         Task<T> Update(T entity);
         Task<T> Delete(int id);
-        double CalculateGrandTotal(Invoice order);
+        Task CalculateGrandTotal(int cartItemId);
         double CalculateProductQuantity(int productId);
+        //Task<Invoice> AddValue(int id);
     }
 }

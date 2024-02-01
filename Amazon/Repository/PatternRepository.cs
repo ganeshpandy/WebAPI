@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-    public class PatternRepository : IOrder<User>,IOrder<Product>,IOrder<CartItem>,IOrder<Invoice>
+    public class PatternRepository : IOrder<User>, IOrder<Product>, IOrder<CartItem>, IOrder<Invoice>
     {
         private readonly ProductContext _context;
 
@@ -26,7 +26,7 @@ namespace Repository
             return result.Entity;
         }
 
-      
+
 
         public async Task<User> Delete(int id)
         {
@@ -62,7 +62,7 @@ namespace Repository
                 result.UserName = entity.UserName;
                 result.Address = entity.Address;
                 result.Email = entity.Email;
-                result.Address=entity.Address;
+                result.Address = entity.Address;
                 result.Phno = entity.Phno;
                 return result;
             }
@@ -79,12 +79,12 @@ namespace Repository
                 updateProduct.SellingPrice = product.SellingPrice;
                 updateProduct.AvaliableQuantity = product.AvaliableQuantity;
 
-               /* var CartItem = await _context.CartItems.FirstOrDefaultAsync(c => c.CartItemId == product.ProductId);
-                if (CartItem != null)
-                {
-                    var products = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == CartItem.ProductId);
-                    updateProduct.AvaliableQuantity = product.AvaliableQuantity - CartItem.Quantity;
-                }*/
+                /* var CartItem = await _context.CartItems.FirstOrDefaultAsync(c => c.CartItemId == product.ProductId);
+                 if (CartItem != null)
+                 {
+                     var products = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == CartItem.ProductId);
+                     updateProduct.AvaliableQuantity = product.AvaliableQuantity - CartItem.Quantity;
+                 }*/
                 await _context.SaveChangesAsync();
                 return updateProduct;
             }
@@ -103,6 +103,7 @@ namespace Repository
             if (product != null)
             {
                 product.AvaliableQuantity = (int)CalculateProductQuantity(product.ProductId);
+                await _context.SaveChangesAsync();
             }
 
             return product;
@@ -112,11 +113,11 @@ namespace Repository
         {
             return await _context.Products.ToListAsync();
         }
-        
-         async Task<Product> IOrder<Product>.Delete(int id)
+
+        async Task<Product> IOrder<Product>.Delete(int id)
         {
             var result = await _context.Products
-              .FirstOrDefaultAsync(C => C.UserId == id);
+              .FirstOrDefaultAsync(C => C.ProductId == id);
 
             if (result != null)
             {
@@ -125,7 +126,7 @@ namespace Repository
             }
             return result;
         }
-        
+
         //----------------------------------------Cart item----------------------------------------------     
         async Task<IEnumerable<CartItem>> IOrder<CartItem>.GetOrder()
         {
@@ -137,9 +138,16 @@ namespace Repository
         }
         public async Task<CartItem> Add(CartItem cartItem)
         {
-            var addProduct = await _context.CartItems.AddAsync(cartItem);
-            await _context.SaveChangesAsync();
-            return addProduct.Entity;
+            var result = await _context.CartItems.AddAsync(cartItem);
+            if (cartItem != null && cartItem.Product != null)
+            {                
+                cartItem.Amount = (int)cartItem.Product.SellingPrice;
+            }            
+            //await CalculateGrandTotal((int)cartItem.GrandTotal);
+            await _context.SaveChangesAsync();            
+            await CalculateGrandTotal(cartItem.CartItemId);
+
+            return result.Entity;
         }
         public async Task<CartItem> Update(CartItem cartItem)
         {
@@ -148,12 +156,15 @@ namespace Repository
             if (updateCartItem != null)
             {
                 updateCartItem.Quantity = cartItem.Quantity;
-
                 await _context.SaveChangesAsync();
+
+                // Calculate the amount and update the GrandTotal in the associated Invoice
+                await CalculateGrandTotal(cartItem.CartItemId);
+
                 return updateCartItem;
             }
             throw new Exception("Id not found");
-        }        
+        }
         async Task<CartItem> IOrder<CartItem>.Delete(int id)
         {
             var result = await _context.CartItems
@@ -174,21 +185,61 @@ namespace Repository
         }
         async Task<Invoice> IOrder<Invoice>.GetByID(int id)
         {
-            var invoice = await _context.Invoices.FirstOrDefaultAsync(e => e.InvoiceId == id);
+            //var result= await _context.CartItems.FirstOrDefaultAsync(e => e.CartItemId == Id);
+            var invoice = await _context.Invoices
+                .Include(p => p.User)
+                .Include(i => i.CartItem)
+                    .ThenInclude(ci => ci.Product) // Include the Product related to the CartItem
+                .FirstOrDefaultAsync(i => i.InvoiceId == id);
 
-            if (invoice != null)
-            {                
-                invoice.GrandTotal = CalculateGrandTotal(invoice);
+            // Additional logic to calculate properties based on related entities
+            if (invoice != null && invoice.CartItem != null && invoice.CartItem.Product != null)
+            {
+                // Populate the Invoice properties based on related entities
+                invoice.InvoiceUserName = invoice.User?.UserName; 
+                invoice.InvoiceCategoryName = invoice.CartItem.Product.CategoryName;
+                invoice.InvoiceProductName = invoice.CartItem.Product.ProductName;
             }
 
             return invoice;
         }
         public async Task<Invoice> Add(Invoice order)
         {
-            var addInvoice = await _context.Invoices.AddAsync(order);
+            // Calculate GrandTotal based on the CartItem properties
+            //order.GrandTotal = (double)order.CartItem.Amount;
+
+            // Add the Invoice to the context
+            var result = await _context.Invoices.AddAsync(order);
+            
+            /* if (order.InvoiceGrandTotal == null)
+             {
+                 order.InvoiceGrandTotal = order.CartItem.GrandTotal;
+             }
+             else 
+             {
+                 throw new Exception("Invalid Amount");
+             }*/
+
+            // Populate the Invoice properties based on related entities
+            if (order.CartItem != null && order.CartItem.Product != null && order.User != null)
+            {
+                result.Entity.InvoiceUserName = order.User.UserName;
+                result.Entity.InvoiceCategoryName = order.CartItem.Product.CategoryName;
+                result.Entity.InvoiceProductName = order.CartItem.Product.ProductName;
+                
+                result.Entity.InvoiceGrandTotal = order.CartItem.GrandTotal;
+                //cartItem.Amount = (decimal)cartItem.Product.SellingPrice;
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+            }
             await _context.SaveChangesAsync();
-            return addInvoice.Entity;
+
+            return result.Entity;
+            
+            
         }
+       
         public Task<Invoice> Update(Invoice entity)
         {
             throw new NotImplementedException();
@@ -205,23 +256,34 @@ namespace Repository
             }
             return result;
         }
-
-        public double CalculateGrandTotal(Invoice order)
+        //CalculateGrandTotal
+        public async Task CalculateGrandTotal(int cartItemId)
         {
-            if (order == null)
+            var cartItem = await _context.CartItems
+                       .Include(c => c.Product)
+                       .FirstOrDefaultAsync(c => c.CartItemId == cartItemId);
+            if(cartItem != null)
             {
-                throw new ArgumentNullException(nameof(order));
+                cartItem.GrandTotal = (double)(cartItem.Quantity * (decimal)cartItem.Product.SellingPrice);
             }
+            
 
-            double grandTotal = order.GrandTotal;
+            await _context.SaveChangesAsync();
+            
 
-            if (order.CartItem != null)
+            /*if (cartItem != null && cartItem.Product != null)
             {
-                grandTotal += order.CartItem.Quantity * order.CartItem.Product.SellingPrice;
-            }
+                var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.CartItemId == cartItemId);
 
-            return grandTotal;
+                if (invoice != null)
+                {                    
+                    //cartItem.Amount = (decimal)cartItem.Product.SellingPrice;       
+                }
+
+            }*/
+            await _context.SaveChangesAsync();
         }
+
 
         public double CalculateProductQuantity(int productId)
         {
@@ -235,7 +297,9 @@ namespace Repository
             return cartItem.Product.AvaliableQuantity - cartItem.Quantity;
         }
 
+
     }
+   
 
 }
 

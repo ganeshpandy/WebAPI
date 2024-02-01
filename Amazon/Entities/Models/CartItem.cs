@@ -14,12 +14,12 @@ namespace Amazon.Entities.Models
         [Key]
         public int CartItemId { get; set; }
         public int Quantity {  get; set; }
-        public decimal Amount { get; set; }
-        
-        [ForeignKey("Product")]
+        public int Amount {  get; set; }
+        public double GrandTotal { get; set; }
+        [ForeignKey("ProductId")]
         public int ProductId { get; set; }//fk
         public Product Product { get; set; }
-
+        
 
     }
 }

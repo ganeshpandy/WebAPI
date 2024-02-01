@@ -40,13 +40,15 @@ namespace OnlineShopping.Controllers
         [HttpPost("AddUser")]
         public async Task<ActionResult<User>> AddUser(User entity)
         {
+            await user.Add(entity);
+            return entity;  
 
-            if (entity != null)
+            /*if (entity != null)
             {               
                 await user.Add(entity);
             }
 
-            return entity;
+            return entity;*/
         }
         [HttpPut("UpdateUser")]
         public async Task<ActionResult<User>> UpdateUser(User entity)
@@ -75,13 +77,15 @@ namespace OnlineShopping.Controllers
         [HttpPost("AddProduct")]
         public async Task<ActionResult<Product>> AddProduct(Product entity)
         {
+            await products.Add(entity);
+            return entity;
 
-            if (entity != null)
+            /*if (entity != null)
             {
                 await products.Add(entity);
             }
 
-            return entity;
+            return entity;*/
         }
         [HttpPut("UpdateProduct")]
         public async Task<ActionResult<Product>> UpdateProduct(Product entity)
@@ -111,12 +115,13 @@ namespace OnlineShopping.Controllers
         [HttpPost("AddCartItems")]
         public async Task<CartItem> AddCartItems(CartItem cartItem)
         {
-            CartItem obj = new CartItem();
+            return await cartItems.Add(cartItem);
+            /*CartItem obj = new CartItem();
             if (cartItem != null)
             {
                 obj = await cartItems.Add(cartItem);
             }
-            return obj;
+            return obj;*/
         }
         [HttpPut("UpdateCartItems")]
         public async Task<CartItem> UpdateCartItems(CartItem cartItem)
@@ -149,13 +154,15 @@ namespace OnlineShopping.Controllers
         [HttpPost("AddInvoice")]
         public async Task<Invoice> AddInvoice(Invoice invoice)
         {
-            Invoice obj = new Invoice();
+            return await invoices.Add(invoice);
+            /*Invoice obj = new Invoice();
             if (invoice != null)
             {
                 obj = await invoices.Add(invoice);
             }
-            return obj;
+            return obj;*/
         }
+        
         [HttpPut("UpdateInvoice")]
         public async Task<Invoice> UpdateInvoice(Invoice invoice)
         {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entities.Migrations
 {
     [DbContext(typeof(ProductContext))]
-    [Migration("20240116155613_test1")]
+    [Migration("20240123041728_test1")]
     partial class test1
     {
         /// <inheritdoc />
@@ -32,8 +32,11 @@ namespace Entities.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<double>("GrandTotal")
+                        .HasColumnType("float");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -59,12 +62,26 @@ namespace Entities.Migrations
                     b.Property<int>("CartItemId")
                         .HasColumnType("int");
 
-                    b.Property<double>("GrandTotal")
+                    b.Property<string>("InvoiceCategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("InvoiceGrandTotal")
                         .HasColumnType("float");
+
+                    b.Property<string>("InvoiceProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("InvoiceId");
 
                     b.HasIndex("CartItemId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Invoices");
                 });
@@ -89,12 +106,7 @@ namespace Entities.Migrations
                     b.Property<double>("SellingPrice")
                         .HasColumnType("float");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("ProductId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Products");
                 });
@@ -146,16 +158,13 @@ namespace Entities.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CartItem");
-                });
-
-            modelBuilder.Entity("Amazon.Entities.Models.Product", b =>
-                {
                     b.HasOne("Amazon.Entities.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CartItem");
 
                     b.Navigation("User");
                 });

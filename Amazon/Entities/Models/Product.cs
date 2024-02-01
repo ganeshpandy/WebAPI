@@ -12,15 +12,11 @@ namespace Amazon.Entities.Models
     public class Product
     {
         [Key]
-        public int ProductId { get; set; } = 1;
+        public int ProductId { get; set; } 
         public string CategoryName { get; set; }
         public string ProductName { get; set; }
         public double SellingPrice { get; set; }
-        public int AvaliableQuantity {  get; set; }
-        [ForeignKey("User")]
-        public int UserId {  get; set; }
-        public  User User { get; set; }
-      
+        public int AvaliableQuantity {  get; set; }    
 
     }
 }

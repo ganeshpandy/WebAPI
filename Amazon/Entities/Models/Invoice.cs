@@ -13,12 +13,13 @@ namespace Amazon.Entities.Models
     {
         [Key]
         public int InvoiceId { get; set; }
-        public double GrandTotal { get; set; } = 0;
-
-
-        [ForeignKey("CartItem")]
-        public int CartItemId { get; set; }
-       
+        public string InvoiceUserName { get; set; }
+        public string InvoiceCategoryName {  get; set; }
+        public string InvoiceProductName {  get; set; }
+        public double InvoiceGrandTotal { get; set; } 
+        public int UserId {  get; set; }
+        public User User { get; set; }       
+        public int CartItemId { get; set; }       
         public CartItem CartItem { get; set; }
         
     }
