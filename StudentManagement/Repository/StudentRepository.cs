@@ -44,8 +44,7 @@ namespace StudentRepositories
         {
             var GetStudent = await _contextDB.StudentDetail.FirstOrDefaultAsync(t => t.Id.Equals(mark.StudentId));
             if(GetStudent != null)
-            {
-               
+            {               
                     Student getStudent = GetStudent;
                     mark.Student = getStudent;
                     
@@ -156,8 +155,7 @@ namespace StudentRepositories
             {
                 if(result!=null)
                 {
-                    var change = await _contextDB.Report.FirstOrDefaultAsync(t =>
-                               t.MarkId.Equals(result.Id));
+                    var change = await _contextDB.Report.FirstOrDefaultAsync(t => t.MarkId.Equals(result.Id));
                     if(change!=null)
                     {
                         StudentReports reports = Calculation(change, result);
